@@ -67,13 +67,44 @@ class Parser {
     }
 
     private func unary(depth: Int64): Int64 {
+        let negative = takeMinusSigns()
+        let base = primary(depth)
+        let value = match (token.kind) {
+            case Infix(Power) => powerChain(base, depth)
+            case _ => base
+        }
+        if (negative) { addNode(Negate(value)) } else { value }
+    }
+
+    private func takeMinusSigns(): Bool {
         var negative = false
         while (let Infix(Subtract) <- token.kind) {
             negative = !negative
             advance()
         }
-        let child = primary(depth)
-        if (negative) { addNode(Negate(child)) } else { child }
+        negative
+    }
+
+    private func powerChain(first: Int64, depth: Int64): Int64 {
+        let pending = ArrayList<(Int64, Position, Bool)>()
+        var operand = first
+        while (let Infix(Power) <- token.kind) {
+            let at = token.at
+            advance()
+            let negativeExponent = takeMinusSigns()
+            pending.add((operand, at, negativeExponent))
+            operand = primary(depth)
+        }
+
+        // 右侧的负号修饰整个指数。2^-3^2 按 2^(-(3^2)) 建树。
+        var i = pending.size
+        while (i > 0) {
+            i--
+            let (base, at, negativeExponent) = pending[i]
+            let exponent = if (negativeExponent) { addNode(Negate(operand)) } else { operand }
+            operand = addNode(Binary(Power, base, exponent, at))
+        }
+        operand
     }
 
     private func primary(depth: Int64): Int64 {

@@ -120,6 +120,7 @@ class Lexer <: TokenSource {
             case r'-' => Infix(Subtract)
             case r'*' => Infix(Multiply)
             case r'/' => Infix(Divide)
+            case r'^' => Infix(Power)
             case r'(' => LeftParen
             case r')' => RightParen
             case _ => throw ExprException("INVALID_CHARACTER", at, "无法识别字符“${ch}”")

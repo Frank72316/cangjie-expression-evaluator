@@ -1,6 +1,6 @@
 [package]
 name = "cjexpr"
-version = "0.2.0"
+version = "0.3.0"
 cjc-version = "1.0.5"
 output-type = "static"
 description = "Arithmetic expressions with variable bindings and source diagnostics"

@@ -13,6 +13,15 @@ private func binaryValue(op: BinaryOp, left: Float64, right: Float64, at: Positi
                 throw ExprException("DIVISION_BY_ZERO", at, "除数为零")
             }
             left / right
+        case Power =>
+            if (left == 0.0 && right < 0.0) {
+                throw ExprException("DIVISION_BY_ZERO", at, "零的负次幂需要除以零")
+            }
+            let value = left ** right
+            if (value.isNaN()) {
+                throw ExprException("POWER_DOMAIN", at, "负底数的指数必须为整数")
+            }
+            value
     }
     if (result.isInf() || result.isNaN()) {
         throw ExprException("NON_FINITE", at, "运算结果超出 Float64 的有限范围")

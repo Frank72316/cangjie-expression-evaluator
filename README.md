@@ -10,7 +10,7 @@
 
 ```toml
 [dependencies]
-cjexpr = { git = "https://atomgit.com/A72316/cangjie-expression-evaluator.git", tag = "v0.2.0" }
+cjexpr = { git = "https://atomgit.com/A72316/cangjie-expression-evaluator.git", tag = "v0.3.0" }
 ```
 
 ```cangjie
@@ -40,7 +40,7 @@ main() {
 | `formula.evaluate(ev)` / `formula.evaluateAsync(ev)` | 用 `ev` 当前的变量快照同步或异步执行已解析的公式。 |
 | `ExprException` | 读取错误代码、中文原因及从 1 起算的行列号。 |
 
-支持十进制小数、科学计数法、四则运算、括号和一元负号。乘除先于加减，同级从左到右。以 `price / (count - 4)` 为例，当 `count` 为 4 时，异常指向第 1 行第 7 列的除号。[语法与错误代码](doc/api.md)
+支持十进制小数、科学计数法、四则运算、幂、括号和一元负号。幂从右向左结合，`2^3^2` 得到 512。底数前的负号在幂之后计算，`-2^2` 得到 −4，`(-2)^2` 得到 4。复利公式可写作 `principal * (1 + rate)^years`。[语法与错误代码](doc/api.md)
 
 ## 构建和测试
 
@@ -62,4 +62,4 @@ cd cangjie-expression-evaluator
 
 词法器记录行列，递归下降解析器把表达式写成按后序排列的节点表，求值器顺序计算每个节点。平坦的长表达式使用循环，括号嵌套上限为 64 层。[设计文档](doc/design.md)
 
-当前版本为 `v0.2.0`，采用 Apache License 2.0。[变更记录](CHANGELOG.md) · [许可证全文](LICENSE)
+当前版本为 `v0.3.0`，采用 Apache License 2.0。[变更记录](CHANGELOG.md) · [许可证全文](LICENSE)

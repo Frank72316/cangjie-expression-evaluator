@@ -12,7 +12,7 @@ func captureError<T>(operation: () -> T): ExprException {
     throw Exception("预期抛出 ExprException，实际求值成功")
 }
 
-private func checkError(expr: String, code: String, line: Int64, column: Int64): Unit {
+func checkError(expr: String, code: String, line: Int64, column: Int64): Unit {
     let e = captureError({ => evaluate(expr) })
     @Expect(e.code, code)
     @Expect(e.line, line)
