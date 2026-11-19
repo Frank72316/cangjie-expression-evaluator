@@ -1,0 +1,24 @@
+name: Cangjie 1.0.5 checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: [ubuntu-latest, x64, small]
+    steps:
+      - name: Check out the repository
+        uses: checkout
+      - name: Build, test and run the example
+        run: |
+          set -e
+          sdk_dir="$(mktemp -d)"
+          archive="$sdk_dir/sdk.tar.gz"
+          curl --fail --location --retry 3 --output "$archive" 'https://cangjie-lang.cn/v1/files/auth/downLoad?nsId=142267&fileName=cangjie-sdk-linux-x64-1.0.5.tar.gz&objectKey=698acf46bd66ae22b62330b0'
+          echo "bacad84df8e0281c5395bab4c40e481e3ea6cc712eed5c953903b0d561a14562  $archive" | sha256sum --check
+          tar -xzf "$archive" -C "$sdk_dir"
+          . "$sdk_dir/cangjie/envsetup.sh"
+          bash scripts/check.sh
