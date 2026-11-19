@@ -12,7 +12,7 @@ struct Position {
 
 /** 表达式或变量绑定有误。message 含中文说明与从 1 起算的行列号。 */
 public class ExprException <: Exception {
-    /** 稳定的错误代码，取值见 README 的错误表。 */
+    /** 稳定的错误代码，取值见 doc/api.md 的错误表。 */
     public let code: String
     /** 表达式中的行号。绑定错误定位到传入的变量名。 */
     public let line: Int64

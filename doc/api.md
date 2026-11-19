@@ -22,6 +22,17 @@
 | `Evaluator.bind(name: String, value: Float64): Unit` | 按名称插入或覆盖绑定。先校验名称和值，再写入变量表。 | 成功返回 `Unit`。非法名称或非有限值抛出异常，原值保留。 |
 | `Evaluator.evaluate(expr: String): Float64` | 先在锁内复制变量表，再解析和求值。 | 返回数值，错误时抛出 `ExprException`。 |
 
+## 重复使用同一个公式
+
+`CompiledExpression(expr: String)` 在构造时解析源文本并保存节点及其位置。非法字符、非法字面量或括号不匹配会立即抛出 `ExprException`。构造成功后可以多次使用同一个对象，也可以将它传给多个线程。
+
+| 调用 | 变量与错误 |
+| --- | --- |
+| `formula.evaluate(ev: Evaluator): Float64` | 读取本次调用的变量快照。未知变量、除零及运算溢出在本次执行时抛出。 |
+| `formula.evaluateAsync(ev: Evaluator): Future<Float64>` | 提交时截取变量快照，将执行结果或异常交给 `get()`。 |
+
+例如，`CompiledExpression("10 / x")` 可以在绑定 `x` 之前构造。将 `x` 绑定为 0 时，求值会报告第 4 列的除零错误。把 `x` 更新为 2，再次执行同一公式即可得到 5。
+
 ## 异步调用
 
 `Evaluator.evaluateAsync(expr: String): Future<Float64>` 在提交时截取变量快照。之后调用 `bind` 只会影响后续提交。通过 `Future.get()` 取得数值，后台任务中的 `ExprException` 也由 `get()` 抛出。
