@@ -1,6 +1,6 @@
 [package]
 name = "expression_example"
-version = "0.2.0"
+version = "0.3.0"
 cjc-version = "1.0.5"
 output-type = "executable"
 description = "Use cjexpr from a separate Cangjie package"

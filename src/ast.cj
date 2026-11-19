@@ -1,7 +1,7 @@
 package cjexpr
 
 enum BinaryOp {
-    Add | Subtract | Multiply | Divide
+    Add | Subtract | Multiply | Divide | Power
 }
 
 // 子节点总是先于父节点写入列表。节点编号同时也是求值结果的下标。

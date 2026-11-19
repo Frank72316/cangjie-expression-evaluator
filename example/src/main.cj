@@ -4,6 +4,7 @@ import cjexpr.*
 
 main() {
     println("2 + 3 * 4 = ${evaluate("2 + 3 * 4")}")
+    println("2^3^2 = ${evaluate("2^3^2")}")
 
     let calculator = Evaluator()
     calculator.bind("price", 12.5)
