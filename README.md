@@ -10,7 +10,7 @@
 
 ```toml
 [dependencies]
-cjexpr = { git = "https://atomgit.com/A72316/cangjie-expression-evaluator.git", tag = "v0.3.0" }
+cjexpr = { git = "https://atomgit.com/A72316/cangjie-expression-evaluator.git", tag = "v0.4.0" }
 ```
 
 ```cangjie
@@ -18,12 +18,12 @@ import cjexpr.*
 
 main() {
     let cart = Evaluator()
-    cart.bind("price", 12.5)
-    cart.bind("count", 4.0)
-    let total = CompiledExpression("price * count - 5")
-    println(total.evaluate(cart))  // 45.000000
-    cart.bind("count", 8.0)
-    println(total.evaluate(cart))  // 95.000000，复用同一个公式
+    cart.bindAll([("price", 12.5), ("count", 4.0)])
+    let total = CompiledExpression("price * count")
+    let pending = total.evaluateAsync(cart)
+    cart.bindAll([("price", 15.0), ("count", 6.0)])
+    println(pending.get())          // 50.000000，提交任务时的单价和数量
+    println(total.evaluate(cart))   // 90.000000，更新后的单价和数量
 }
 ```
 
@@ -34,6 +34,7 @@ main() {
 | `evaluate(expr: String): Float64` | 使用空变量表计算表达式。 |
 | `Evaluator()` | 创建具有独立变量表的求值器。 |
 | `bind(name: String, value: Float64): Unit` | 新建或更新一个变量。 |
+| `bindAll(entries: Array<(String, Float64)>): Unit` | 一次更新多个变量，全部校验成功后一起生效。 |
 | `Evaluator.evaluate(expr: String): Float64` | 使用调用时的变量快照求值。 |
 | `evaluateAsync(expr: String): Future<Float64>` | 提交后台计算，使用 `get()` 取得结果或错误。 |
 | `CompiledExpression(expr: String)` | 解析并保存公式，可供多个求值器共享。 |
@@ -56,10 +57,10 @@ cd cangjie-expression-evaluator
 | Windows PowerShell | `.\scripts\check.bat` |
 | Linux / macOS | `bash scripts/check.sh` |
 
-单独运行单元测试可执行 `cjpm test`。在 `example` 目录执行 `cjpm run`，可看到同一张订单调价前后的结果 `50` 和 `60`。[可运行示例](example/src/main.cj)
+单独运行单元测试可执行 `cjpm test`。在 `example` 目录执行 `cjpm run`，可看到同一张订单成批更新单价和数量前后的总价 `50` 和 `90`。[可运行示例](example/src/main.cj)
 
 ## 实现与版本
 
 词法器记录行列，递归下降解析器把表达式写成按后序排列的节点表，求值器顺序计算每个节点。平坦的长表达式使用循环，括号嵌套上限为 64 层。[设计文档](doc/design.md)
 
-当前版本为 `v0.3.0`，采用 Apache License 2.0。[变更记录](CHANGELOG.md) · [许可证全文](LICENSE)
+当前版本为 `v0.4.0`，采用 Apache License 2.0。[变更记录](CHANGELOG.md) · [许可证全文](LICENSE)
