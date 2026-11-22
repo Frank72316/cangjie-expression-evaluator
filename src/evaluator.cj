@@ -1,5 +1,6 @@
 package cjexpr
 
+import std.collection.ArrayList
 import std.collection.HashMap
 import std.sync.Mutex
 
@@ -60,6 +61,16 @@ public class Evaluator {
 
     func snapshot(): HashMap<String, Float64> {
         synchronized(mutex) { bindings.clone() }
+    }
+
+    func findUnbound(names: Array<String>): Array<String> {
+        let missing = ArrayList<String>()
+        synchronized(mutex) {
+            for (name in names) {
+                if (!bindings.contains(name)) { missing.add(name) }
+            }
+        }
+        missing.toArray()
     }
 
     /** 使用调用时的变量快照求值。非法表达式、未绑定变量或除零会抛出 ExprException。 */

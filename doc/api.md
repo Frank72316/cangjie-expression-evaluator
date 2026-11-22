@@ -43,6 +43,24 @@
 
 例如，`CompiledExpression("10 / x")` 可以在绑定 `x` 之前构造。将 `x` 绑定为 0 时，求值会报告第 4 列的除零错误。把 `x` 更新为 2，再次执行同一公式即可得到 5。
 
+## 在求值前检查变量
+
+`formula.variableNames(): Array<String>` 返回公式里的全部变量，按名字在源文本中第一次出现的顺序排列。同名变量只出现一次，`x` 和 `X` 分别计入。纯数字公式返回空数组。
+
+`formula.missingVariables(ev: Evaluator): Array<String>` 按同样的顺序返回尚未绑定的变量。每次查询读取该求值器的一致状态，绑定为零的变量也算已填写。两个接口每次都返回独立数组，调用方可修改结果。
+
+```cangjie
+let order = CompiledExpression("price * qty - discount")
+let ev = Evaluator()
+ev.bind("price", 12.5)
+let missing = order.missingVariables(ev)     // ["qty", "discount"]
+ev.bindAll([("qty", 4.0), ("discount", 0.0)])
+println(order.missingVariables(ev).size)     // 0；之前取得的 missing 仍含两项
+println(order.evaluate(ev))                  // 50.000000
+```
+
+查询只检查绑定。即使返回空数组，求值仍可能因除零等算术错误抛出异常。查询和求值各自读取调用当时的状态，两次调用之间的更新会反映在后一次调用中。
+
 ## 异步调用
 
 `Evaluator.evaluateAsync(expr: String): Future<Float64>` 在提交时截取变量快照。之后调用 `bind` 只会影响后续提交。通过 `Future.get()` 取得数值，后台任务中的 `ExprException` 也由 `get()` 抛出。
