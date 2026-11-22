@@ -7,8 +7,11 @@ main() {
     println("2^3^2 = ${evaluate("2^3^2")}")
 
     let calculator = Evaluator()
-    calculator.bindAll([("price", 12.5), ("count", 4.0)])
     let total = CompiledExpression("price * count")
+    println("订单公式的变量 = ${String.join(total.variableNames(), delimiter: ", ")}")
+    calculator.bind("price", 12.5)
+    println("还需填写 = ${String.join(total.missingVariables(calculator), delimiter: ", ")}")
+    calculator.bind("count", 4.0)
     let pending = total.evaluateAsync(calculator)
     calculator.bindAll([("price", 15.0), ("count", 6.0)])
     println("提交任务时的总价 = ${pending.get()}")

@@ -10,7 +10,7 @@
 
 ```toml
 [dependencies]
-cjexpr = { git = "https://atomgit.com/A72316/cangjie-expression-evaluator.git", tag = "v0.4.0" }
+cjexpr = { git = "https://atomgit.com/A72316/cangjie-expression-evaluator.git", tag = "v0.5.0" }
 ```
 
 ```cangjie
@@ -18,8 +18,10 @@ import cjexpr.*
 
 main() {
     let cart = Evaluator()
-    cart.bindAll([("price", 12.5), ("count", 4.0)])
     let total = CompiledExpression("price * count")
+    cart.bind("price", 12.5)
+    println(String.join(total.missingVariables(cart), delimiter: ", "))  // count
+    cart.bind("count", 4.0)
     let pending = total.evaluateAsync(cart)
     cart.bindAll([("price", 15.0), ("count", 6.0)])
     println(pending.get())          // 50.000000，提交任务时的单价和数量
@@ -38,6 +40,8 @@ main() {
 | `Evaluator.evaluate(expr: String): Float64` | 使用调用时的变量快照求值。 |
 | `evaluateAsync(expr: String): Future<Float64>` | 提交后台计算，使用 `get()` 取得结果或错误。 |
 | `CompiledExpression(expr: String)` | 解析并保存公式，可供多个求值器共享。 |
+| `formula.variableNames(): Array<String>` | 按首次出现的顺序列出公式引用的变量，每个名字只出现一次。 |
+| `formula.missingVariables(ev): Array<String>` | 列出这些变量中在 `ev` 里仍未绑定的名字，顺序与公式一致。 |
 | `formula.evaluate(ev)` / `formula.evaluateAsync(ev)` | 用 `ev` 当前的变量快照同步或异步执行已解析的公式。 |
 | `ExprException` | 读取错误代码、中文原因及从 1 起算的行列号。 |
 
@@ -63,4 +67,4 @@ cd cangjie-expression-evaluator
 
 词法器记录行列，递归下降解析器把表达式写成按后序排列的节点表，求值器顺序计算每个节点。平坦的长表达式使用循环，括号嵌套上限为 64 层。[设计文档](doc/design.md)
 
-当前版本为 `v0.4.0`，采用 Apache License 2.0。[变更记录](CHANGELOG.md) · [许可证全文](LICENSE)
+当前版本为 `v0.5.0`，采用 Apache License 2.0。[变更记录](CHANGELOG.md) · [许可证全文](LICENSE)

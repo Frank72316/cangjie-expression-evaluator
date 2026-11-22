@@ -2,6 +2,7 @@ package cjexpr
 
 import std.collection.ArrayList
 import std.collection.HashMap
+import std.collection.HashSet
 
 private func binaryValue(op: BinaryOp, left: Float64, right: Float64, at: Position): Float64 {
     let result = match (op) {
@@ -36,6 +37,23 @@ public class CompiledExpression {
     /** 解析完整表达式。词法、语法或字面量错误会在构造时抛出 ExprException。 */
     public init(expr: String) {
         nodes = Parser(Lexer(expr)).parse()
+    }
+
+    /** 按公式中首次出现的顺序返回变量名。每次调用返回独立的数组。 */
+    public func variableNames(): Array<String> {
+        let seen = HashSet<String>()
+        let names = ArrayList<String>()
+        for (node in nodes) {
+            if (let Variable(name, _) <- node) {
+                if (seen.add(name)) { names.add(name) }
+            }
+        }
+        names.toArray()
+    }
+
+    /** 按公式中的顺序列出当前仍未绑定的变量。一次查询读取同一时刻的绑定状态。 */
+    public func missingVariables(evaluator: Evaluator): Array<String> {
+        evaluator.findUnbound(variableNames())
     }
 
     /** 使用 evaluator 当前的变量快照执行公式。变量和算术错误抛出 ExprException。 */
